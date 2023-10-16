@@ -5,17 +5,80 @@ from Promo import Promo
 
 
 def main():
-    URL = "https://www.cian.ru/sale/flat/288041113/"
+    PAGE_NUMBER = 1
 
-    # отправляем get запрос на сайт URL
-    request = requests.get(URL)
-    # print(request.status_code)
+
+    rooms_count = 1
+    region_name = {
+        "moscow": 1,
+    }
+    deal_type = {
+        "sale": "sale",
+        "rent": "rent"
+    }
+    offer_type = "flat"
+    min_price = 1
+    max_price = 7000000
+
+    # попадаем на стартовую страницу поиска по заданным критериям
+    start_url = f"https://www.cian.ru/cat.php?currency=2&deal_type={deal_type['sale']}&engine_version=2&maxprice={max_price}&minprice={min_price}&object_type%5B0%5D=2&offer_type={offer_type}&p={PAGE_NUMBER}&region={region_name['moscow']}&room{rooms_count}=1"
+
+    page_number = PAGE_NUMBER
+    page_url = start_url
+
+    while True:
+        request = requests.get(page_url)
+        soup = bs(request.text, "html.parser")
+
+        print(f"страница поиска: {page_number}")
+        # работаем с объявлениями на странице поиска
+        pars_search_page(page_url)
+
+        # ищем пагинатор, если есть, то переходим на следующую страницу и повторяем процедуру
+        pagination = soup.find(attrs={"data-name": "Pagination"})
+        if pagination is None:
+            break
+        next_page_link_tag = pagination.find("a", string="Дальше")
+        if next_page_link_tag is None:
+            break
+        else:
+            page_url = page_url.replace(f"p={page_number}", f"p={page_number + 1}")
+            page_number += 1
+
+
+def pars_search_page(page_url):
+    request = requests.get(page_url)
+    soup = bs(request.text, "html.parser")
+
+    # находим блок, с которого начинаются рекламные предложения
+    removed_tags = soup.select("div[data-name='Suggestions']")
+    # удаляем всю рекламу, если ее нет, то идем дальше
+    removed_tags[0].decompose() if len(removed_tags) else "pass"
+
+
+    offers = soup.find_all(attrs={"data-testid": "offer-card"})
+    if len(offers) == 0:
+        print(f"Не найдено объявлений по заданным параметрам.\n"
+              f"Попробуйте задать другие параметры и повторить поиск.")
+    else:
+        offer_links = []
+        for index, offer in enumerate(offers):
+            offer_link = offer.a.get("href")
+            offer_links.append(offer_link)
+            print(f"Обработка объявления на странице {index+1}/{len(offers)}")
+
+            pars_promo(offer_link)
+
+
+def pars_promo(offer_url):
+
+    # отправляем get запрос на сайт
+    request = requests.get(offer_url)
+    # достаем все теги со страницы объявления
+    soup = bs(request.text, "html.parser")
 
     # создаем объект
     promo = Promo()
-
-    # достаем все теги со страницы объявления
-    soup = bs(request.text, "html.parser")
 
     # достаем название объявления
     topic_tag = soup.find_all("h1")
