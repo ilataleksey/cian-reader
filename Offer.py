@@ -1,14 +1,14 @@
-class Promo(object):
+class Offer(object):
     def __init__(self):
         self._topic = ""
-        self._prompt = ""
+        self._description = ""
         self._price = 0
         self._flat = {}
         self._house = {}
 
     def __str__(self):
         return (f"Наименование:  {self._topic} \n\n"
-        f"Описание: {self._prompt} \n\n"
+        f"Описание: {self._description} \n\n"
         f"Цена: {self._price} \n\n"
         f"Описание квартиры: {self._flat.items()} \n\n"
         f"Описание дома: {self._house.items()}")
@@ -22,12 +22,12 @@ class Promo(object):
         self._topic = text
 
     @property
-    def prompt(self):
-        return self._prompt
+    def description(self):
+        return self._description
 
-    @prompt.setter
-    def prompt(self, text):
-        self._prompt = text
+    @description.setter
+    def description(self, text):
+        self._description = text
 
     @property
     def price(self):
