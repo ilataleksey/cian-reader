@@ -54,7 +54,7 @@ def pars_search_page(page_url):
             offer_links.append(offer_link)
             offer = pars_offer(offer_link)
             page_offers.append(offer)
-            print(f"Обработка объявления на странице {index + 1 / len(offers)}")
+            print(f"Обработка объявления на странице {index + 1}/{len(offers)}")
 
         return page_offers
 
@@ -71,6 +71,9 @@ def pars_offer(offer_url):
     # достаем название объявления
     topic_tag = soup.find_all("h1")
     offer.topic = topic_tag[0].text
+
+    # сохраняем в объект ссылку
+    offer.link = offer_url
 
     # достаем описание объявления
     description_tag = soup.select("div[data-id='content']")
