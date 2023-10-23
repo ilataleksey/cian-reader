@@ -3,6 +3,7 @@ class Offer(object):
         self._topic = ""
         self._description = ""
         self._price = 0
+        self._link = ""
         self._flat = {}
         self._house = {}
 
@@ -10,6 +11,7 @@ class Offer(object):
         return (f"Наименование:  {self._topic} \n\n"
         f"Описание: {self._description} \n\n"
         f"Цена: {self._price} \n\n"
+        f"Ссылка: {self._link} \n\n"
         f"Описание квартиры: {self._flat.items()} \n\n"
         f"Описание дома: {self._house.items()}")
 
@@ -52,3 +54,11 @@ class Offer(object):
     @house.setter
     def house(self, dic):
         self._house = dic
+
+    @property
+    def link(self):
+        return self._link
+
+    @link.setter
+    def link(self, text):
+        self._link = text
